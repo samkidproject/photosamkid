@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samkid Watch Repair - Poster Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .canvas-container {
+            max-width: 100%;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            background-color: #ddd;
+            position: relative;
+        }
+
+        #posterCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .controls-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-dot {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 9999px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .color-dot.active {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-black text-gray-800 uppercase tracking-tighter italic">SAMKID WATCH REPAIR</h1>
+            <p class="text-gray-500">Professional Service Poster v4.1</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Sidebar Kontrol -->
+            <div class="lg:col-span-1 space-y-4">
+                <!-- 1. Media -->
+                <div class="controls-card">
+                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
+                        1. Media
+                    </h2>
+                    <button onclick="document.getElementById('imageInput').click()" class="w-full flex items-center justify-center p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition group">
+                        <span class="text-sm font-bold text-gray-600 group-hover:text-blue-600">AMBIL FOTO / GALERI</span>
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" class="hidden"/>
+                </div>
+
+                <!-- 2. Detail Servis -->
+                <div class="controls-card">
+                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
+                        2. Informasi Servis
+                    </h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Nama Jam</label>
+                            <input type="text" id="mainText" value="OMEGA SEAMASTER" class="w-full mt-1 p-2 border rounded font-bold text-sm outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Daftar Pengerjaan (Bisa Enter)</label>
+                            <textarea id="subText" rows="4" class="w-full mt-1 p-2 border rounded text-sm outline-none focus:border-blue-500" placeholder="Contoh:&#10;• Movement Overhaul&#10;• Gasket Replacement&#10;• Water Resistance Test">Full Movement Overhaul&#10;Part Replacement&#10;Pressure Testing 10 Bar</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Harga / Biaya</label>
+                            <input type="text" id="priceText" value="IDR 1.250.000" class="w-full mt-1 p-2 border rounded font-bold text-sm text-blue-600 outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Tema -->
+                <div class="controls-card">
+                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
+                        3. Tema Warna
+                    </h2>
+                    <div class="grid grid-cols-6 gap-2" id="themeGrid"></div>
+                </div>
+
+                <button id="downloadBtn" class="w-full bg-black text-white font-black py-4 rounded-xl shadow-lg hover:bg-gray-800 transition duration-200 uppercase tracking-widest text-sm">
+                    SIMPAN POSTER
+                </button>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="lg:col-span-2 flex flex-col items-center">
+                <div class="canvas-container w-full bg-white p-2">
+                    <canvas id="posterCanvas"></canvas>
+                </div>
+                <p class="mt-4 text-xs text-gray-400 font-bold uppercase tracking-widest text-center">Logo pojok kanan atas tanpa bingkai</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('posterCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageInput = document.getElementById('imageInput');
+        const mainTextInput = document.getElementById('mainText');
+        const subTextInput = document.getElementById('subText');
+        const priceTextInput = document.getElementById('priceText');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const themeGrid = document.getElementById('themeGrid');
+
+        let uploadedImage = null;
+        let samkidLogo = new Image();
+        
+        samkidLogo.crossOrigin = "anonymous";
+        samkidLogo.src = 'https://lh3.googleusercontent.com/d/1lczDvL3fub886F5a4tmo6aHBEhMX5Vkr=s800'; 
+        
+        samkidLogo.onload = () => { if (uploadedImage) updateCanvas(); };
+
+        let bgColor = '#000000';
+        let textColor = '#ffffff';
+
+        const themes = [
+            { bg: '#000000', text: '#ffffff' },
+            { bg: '#ffffff', text: '#000000' },
+            { bg: '#1e3a8a', text: '#ffffff' },
+            { bg: '#111827', text: '#fbbf24' },
+            { bg: '#064e3b', text: '#ffffff' },
+            { bg: '#431407', text: '#e7d5ac' },
+            { bg: '#7f1d1d', text: '#ffffff' },
+            { bg: '#374151', text: '#f3f4f6' },
+            { bg: '#0f172a', text: '#38bdf8' },
+            { bg: '#2e1065', text: '#f5d0fe' },
+            { bg: '#b91c1c', text: '#ffffff' },
+            { bg: '#fbbf24', text: '#000000' }
+        ];
+
+        function init() {
+            canvas.width = 1080;
+            canvas.height = 1350;
+            renderThemes();
+            drawPlaceholder();
+        }
+
+        function renderThemes() {
+            themeGrid.innerHTML = '';
+            themes.forEach((theme) => {
+                const btn = document.createElement('button');
+                btn.className = `color-dot ${bgColor === theme.bg ? 'active' : ''}`;
+                btn.style.backgroundColor = theme.bg;
+                btn.onclick = () => {
+                    bgColor = theme.bg;
+                    textColor = theme.text;
+                    renderThemes();
+                    updateCanvas();
+                };
+                themeGrid.appendChild(btn);
+            });
+        }
+
+        function drawPlaceholder() {
+            ctx.fillStyle = '#f3f4f6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = 'bold 30px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('SILAHKAN PILIH FOTO', canvas.width/2, canvas.height/2);
+        }
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => { uploadedImage = img; updateCanvas(); };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        [mainTextInput, subTextInput, priceTextInput].forEach(el => el.addEventListener('input', updateCanvas));
+
+        function updateCanvas() {
+            if (!uploadedImage) return;
+
+            // 1. Area Foto (72% Tinggi)
+            const photoAreaH = canvas.height * 0.72;
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const imgAspect = uploadedImage.width / uploadedImage.height;
+            const targetAspect = canvas.width / photoAreaH;
+            let rw, rh, ox, oy;
+            if (imgAspect > targetAspect) {
+                rh = photoAreaH; rw = photoAreaH * imgAspect;
+                ox = (canvas.width - rw) / 2; oy = 0;
+            } else {
+                rw = canvas.width; rh = canvas.width / imgAspect;
+                ox = 0; oy = (photoAreaH - rh) / 2;
+            }
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, canvas.width, photoAreaH);
+            ctx.clip();
+            ctx.drawImage(uploadedImage, ox, oy, rw, rh);
+
+            // 2. Logo Watermark (Tanpa Lingkaran, Diperbesar)
+            if (samkidLogo.complete) {
+                const logoHeight = 180; // Ukuran logo diperbesar
+                const logoAspect = samkidLogo.width / samkidLogo.height;
+                const logoWidth = logoHeight * logoAspect;
+                
+                const margin = 50;
+                const lx = canvas.width - logoWidth - margin;
+                const ly = margin;
+
+                // Tambahkan sedikit bayangan halus agar logo terbaca di latar foto apapun
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 12;
+                ctx.drawImage(samkidLogo, lx, ly, logoWidth, logoHeight);
+                ctx.shadowBlur = 0;
+            }
+            ctx.restore();
+
+            // 3. Label Area (Bawah)
+            const labelY = photoAreaH;
+            const labelH = canvas.height - photoAreaH;
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, labelY, canvas.width, labelH);
+
+            // 4. Header Nama Jam
+            ctx.textAlign = 'left';
+            ctx.fillStyle = textColor;
+            ctx.font = '900 68px Inter';
+            ctx.fillText(mainTextInput.value.toUpperCase(), 60, labelY + 95);
+
+            // 5. Daftar Pengerjaan (Multi-line)
+            ctx.font = '500 30px Inter';
+            ctx.globalAlpha = 0.85;
+            const lines = subTextInput.value.split('\n');
+            lines.forEach((line, index) => {
+                if(index < 6) { 
+                    ctx.fillText(line, 60, labelY + 155 + (index * 40));
+                }
+            });
+            ctx.globalAlpha = 1.0;
+
+            // 6. Elemen Harga Elegan
+            if (priceTextInput.value) {
+                const pText = priceTextInput.value;
+                ctx.font = 'bold 40px Inter';
+                const pWidth = ctx.measureText(pText).width;
+                
+                const boxW = pWidth + 70;
+                const boxH = 90;
+                const boxX = canvas.width - boxW - 60;
+                const boxY = labelY + 60;
+
+                // Frame Minimalis Harga
+                ctx.strokeStyle = textColor;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+                
+                // Text Harga
+                ctx.textAlign = 'center';
+                ctx.fillText(pText, boxX + boxW/2, boxY + 58);
+            }
+
+            // Footer Watermark
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 18px Inter';
+            ctx.globalAlpha = 0.3;
+            ctx.fillText('SAMKID WATCH REPAIR - OFFICIAL SERVICE RECORD', canvas.width - 60, canvas.height - 40);
+            ctx.globalAlpha = 1.0;
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!uploadedImage) return alert('Pilih foto dulu!');
+            const link = document.createElement('a');
+            link.download = `SamkidRepair-${mainTextInput.value.slice(0,15)}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        });
+
+        init();
+    </script>
+</body>
+</html>
