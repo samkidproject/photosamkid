@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Samkid Watch Repair - Poster Maker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,108 +11,135 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .canvas-container {
-            max-width: 100%;
+            width: 100%;
+            max-width: 500px; /* Batas lebar pratinjau di layar besar */
+            margin: 0 auto;
             overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-radius: 12px;
-            background-color: #ddd;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: #fff;
             position: relative;
         }
 
         #posterCanvas {
             display: block;
-            max-width: 100%;
+            width: 100%;
             height: auto;
-            margin: 0 auto;
         }
 
         .controls-card {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        /* Optimalisasi touch target untuk HP */
         .color-dot {
-            width: 2.2rem;
-            height: 2.2rem;
-            border-radius: 9999px;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
             border: 2px solid #e5e7eb;
-            transition: all 0.2s ease;
+            transition: transform 0.1s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-dot:active {
+            transform: scale(0.9);
         }
 
         .color-dot.active {
             box-shadow: 0 0 0 2px white, 0 0 0 4px #3b82f6;
         }
+
+        /* Scrollbar halus untuk tema warna */
+        .theme-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 0.75rem;
+            padding: 0.5rem 0.25rem;
+            scrollbar-width: none;
+        }
+        .theme-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        input, textarea, button {
+            font-size: 16px !important; /* Mencegah auto-zoom di iOS/Android */
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-black text-gray-800 uppercase tracking-tighter italic">SAMKID WATCH REPAIR</h1>
-            <p class="text-gray-500">Professional Service Poster v4.1</p>
+<body class="bg-gray-50 text-gray-900">
+    <div class="max-w-md mx-auto pb-24"> <!-- Container khusus ukuran HP -->
+        
+        <header class="p-6 text-center">
+            <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">SAMKID WATCH REPAIR</h1>
+            <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mt-1">Mobile Poster Generator v4.2</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Sidebar Kontrol -->
-            <div class="lg:col-span-1 space-y-4">
-                <!-- 1. Media -->
-                <div class="controls-card">
-                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
-                        1. Media
-                    </h2>
-                    <button onclick="document.getElementById('imageInput').click()" class="w-full flex items-center justify-center p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition group">
-                        <span class="text-sm font-bold text-gray-600 group-hover:text-blue-600">AMBIL FOTO / GALERI</span>
-                    </button>
-                    <input type="file" id="imageInput" accept="image/*" class="hidden"/>
-                </div>
+        <!-- Preview Section - Selalu di atas pada Mobile -->
+        <div class="px-4 mb-6">
+            <div class="canvas-container">
+                <canvas id="posterCanvas"></canvas>
+            </div>
+            <p class="text-[10px] text-gray-400 text-center mt-2 uppercase font-bold tracking-widest">Ketuk simpan jika sudah sesuai</p>
+        </div>
 
-                <!-- 2. Detail Servis -->
-                <div class="controls-card">
-                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
-                        2. Informasi Servis
-                    </h2>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Nama Jam</label>
-                            <input type="text" id="mainText" value="OMEGA SEAMASTER" class="w-full mt-1 p-2 border rounded font-bold text-sm outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Daftar Pengerjaan (Bisa Enter)</label>
-                            <textarea id="subText" rows="4" class="w-full mt-1 p-2 border rounded text-sm outline-none focus:border-blue-500" placeholder="Contoh:&#10;• Movement Overhaul&#10;• Gasket Replacement&#10;• Water Resistance Test">Full Movement Overhaul&#10;Part Replacement&#10;Pressure Testing 10 Bar</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase">Harga / Biaya</label>
-                            <input type="text" id="priceText" value="IDR 1.250.000" class="w-full mt-1 p-2 border rounded font-bold text-sm text-blue-600 outline-none focus:border-blue-500">
-                        </div>
+        <!-- Controls Section -->
+        <div class="px-4 space-y-4">
+            
+            <!-- 1. Media -->
+            <div class="controls-card">
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">1. Media Utama</h2>
+                <button onclick="document.getElementById('imageInput').click()" class="w-full flex items-center justify-center p-4 border-2 border-blue-100 bg-blue-50 rounded-xl hover:bg-blue-100 transition active:scale-95">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="text-sm font-bold text-blue-700">AMBIL FOTO / GALERI</span>
+                </button>
+                <input type="file" id="imageInput" accept="image/*" class="hidden"/>
+            </div>
+
+            <!-- 2. Informasi -->
+            <div class="controls-card">
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Detail Servis</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Nama Brand / Jam</label>
+                        <input type="text" id="mainText" value="ROLEX SUBMARINER" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Detail Pengerjaan</label>
+                        <textarea id="subText" rows="3" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan daftar servis...">Full Movement Overhaul&#10;Gasket Replacement&#10;Water Resistance Test</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Biaya Servis</label>
+                        <input type="text" id="priceText" value="IDR 2.500.000" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm text-blue-600 focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
-
-                <!-- 3. Tema -->
-                <div class="controls-card">
-                    <h2 class="font-bold text-sm mb-3 flex items-center uppercase text-gray-400 tracking-wider">
-                        3. Tema Warna
-                    </h2>
-                    <div class="grid grid-cols-6 gap-2" id="themeGrid"></div>
-                </div>
-
-                <button id="downloadBtn" class="w-full bg-black text-white font-black py-4 rounded-xl shadow-lg hover:bg-gray-800 transition duration-200 uppercase tracking-widest text-sm">
-                    SIMPAN POSTER
-                </button>
             </div>
 
-            <!-- Preview Area -->
-            <div class="lg:col-span-2 flex flex-col items-center">
-                <div class="canvas-container w-full bg-white p-2">
-                    <canvas id="posterCanvas"></canvas>
+            <!-- 3. Tema -->
+            <div class="controls-card">
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">3. Pilih Tema Warna</h2>
+                <div class="theme-scroll" id="themeGrid">
+                    <!-- Tema diisi oleh JS -->
                 </div>
-                <p class="mt-4 text-xs text-gray-400 font-bold uppercase tracking-widest text-center">Logo pojok kanan atas tanpa bingkai</p>
             </div>
+
         </div>
+    </div>
+
+    <!-- Floating Action Button (FAB) untuk Simpan di Mobile -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex gap-3 z-50">
+        <button id="downloadBtn" class="flex-1 bg-black text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-transform uppercase tracking-widest text-sm">
+            SIMPAN POSTER
+        </button>
     </div>
 
     <script>
@@ -128,6 +155,7 @@
         let uploadedImage = null;
         let samkidLogo = new Image();
         
+        // Memastikan logo terambil dengan benar
         samkidLogo.crossOrigin = "anonymous";
         samkidLogo.src = 'https://lh3.googleusercontent.com/d/1lczDvL3fub886F5a4tmo6aHBEhMX5Vkr=s800'; 
         
@@ -143,12 +171,10 @@
             { bg: '#111827', text: '#fbbf24' },
             { bg: '#064e3b', text: '#ffffff' },
             { bg: '#431407', text: '#e7d5ac' },
-            { bg: '#7f1d1d', text: '#ffffff' },
+            { bg: '#b91c1c', text: '#ffffff' },
             { bg: '#374151', text: '#f3f4f6' },
             { bg: '#0f172a', text: '#38bdf8' },
-            { bg: '#2e1065', text: '#f5d0fe' },
-            { bg: '#b91c1c', text: '#ffffff' },
-            { bg: '#fbbf24', text: '#000000' }
+            { bg: '#2e1065', text: '#f5d0fe' }
         ];
 
         function init() {
@@ -161,9 +187,11 @@
         function renderThemes() {
             themeGrid.innerHTML = '';
             themes.forEach((theme) => {
-                const btn = document.createElement('button');
-                btn.className = `color-dot ${bgColor === theme.bg ? 'active' : ''}`;
+                const btn = document.createElement('div');
+                btn.className = `color-dot shrink-0 ${bgColor === theme.bg ? 'active' : ''}`;
                 btn.style.backgroundColor = theme.bg;
+                if(theme.bg === '#ffffff') btn.style.borderColor = '#ddd';
+                
                 btn.onclick = () => {
                     bgColor = theme.bg;
                     textColor = theme.text;
@@ -175,12 +203,12 @@
         }
 
         function drawPlaceholder() {
-            ctx.fillStyle = '#f3f4f6';
+            ctx.fillStyle = '#f9fafb';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#9ca3af';
-            ctx.font = 'bold 30px Inter';
+            ctx.fillStyle = '#d1d5db';
+            ctx.font = '900 40px Inter';
             ctx.textAlign = 'center';
-            ctx.fillText('SILAHKAN PILIH FOTO', canvas.width/2, canvas.height/2);
+            ctx.fillText('KETUK "AMBIL FOTO"', canvas.width/2, canvas.height/2);
         }
 
         imageInput.addEventListener('change', (e) => {
@@ -200,13 +228,15 @@
         function updateCanvas() {
             if (!uploadedImage) return;
 
-            // 1. Area Foto (72% Tinggi)
-            const photoAreaH = canvas.height * 0.72;
+            // Dasar Kanvas
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // 1. Photo Area (72% Tinggi)
+            const photoAreaH = canvas.height * 0.72;
             const imgAspect = uploadedImage.width / uploadedImage.height;
             const targetAspect = canvas.width / photoAreaH;
+            
             let rw, rh, ox, oy;
             if (imgAspect > targetAspect) {
                 rh = photoAreaH; rw = photoAreaH * imgAspect;
@@ -222,20 +252,16 @@
             ctx.clip();
             ctx.drawImage(uploadedImage, ox, oy, rw, rh);
 
-            // 2. Logo Watermark (Tanpa Lingkaran, Diperbesar)
+            // 2. Logo (Watermark Besar di Pojok Kanan Atas)
             if (samkidLogo.complete) {
-                const logoHeight = 180; // Ukuran logo diperbesar
-                const logoAspect = samkidLogo.width / samkidLogo.height;
-                const logoWidth = logoHeight * logoAspect;
-                
+                const logoH = 180;
+                const lAspect = samkidLogo.width / samkidLogo.height;
+                const logoW = logoH * lAspect;
                 const margin = 50;
-                const lx = canvas.width - logoWidth - margin;
-                const ly = margin;
 
-                // Tambahkan sedikit bayangan halus agar logo terbaca di latar foto apapun
                 ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 12;
-                ctx.drawImage(samkidLogo, lx, ly, logoWidth, logoHeight);
+                ctx.shadowBlur = 15;
+                ctx.drawImage(samkidLogo, canvas.width - logoW - margin, margin, logoW, logoH);
                 ctx.shadowBlur = 0;
             }
             ctx.restore();
@@ -246,58 +272,63 @@
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, labelY, canvas.width, labelH);
 
-            // 4. Header Nama Jam
+            // 4. Nama Jam (Header)
             ctx.textAlign = 'left';
             ctx.fillStyle = textColor;
-            ctx.font = '900 68px Inter';
-            ctx.fillText(mainTextInput.value.toUpperCase(), 60, labelY + 95);
+            ctx.font = '900 72px Inter';
+            ctx.fillText(mainTextInput.value.toUpperCase(), 60, labelY + 100);
 
-            // 5. Daftar Pengerjaan (Multi-line)
-            ctx.font = '500 30px Inter';
+            // 5. Deskripsi Pengerjaan
+            ctx.font = '500 32px Inter';
             ctx.globalAlpha = 0.85;
             const lines = subTextInput.value.split('\n');
             lines.forEach((line, index) => {
-                if(index < 6) { 
-                    ctx.fillText(line, 60, labelY + 155 + (index * 40));
+                if(index < 5) {
+                    ctx.fillText(line, 60, labelY + 165 + (index * 45));
                 }
             });
             ctx.globalAlpha = 1.0;
 
-            // 6. Elemen Harga Elegan
+            // 6. Elemen Harga Elegan (Kanan)
             if (priceTextInput.value) {
                 const pText = priceTextInput.value;
-                ctx.font = 'bold 40px Inter';
+                ctx.font = 'bold 42px Inter';
                 const pWidth = ctx.measureText(pText).width;
                 
-                const boxW = pWidth + 70;
-                const boxH = 90;
+                const boxW = pWidth + 80;
+                const boxH = 100;
                 const boxX = canvas.width - boxW - 60;
-                const boxY = labelY + 60;
+                const boxY = labelY + 70;
 
-                // Frame Minimalis Harga
                 ctx.strokeStyle = textColor;
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 4;
                 ctx.strokeRect(boxX, boxY, boxW, boxH);
                 
-                // Text Harga
                 ctx.textAlign = 'center';
-                ctx.fillText(pText, boxX + boxW/2, boxY + 58);
+                ctx.fillText(pText, boxX + boxW/2, boxY + 65);
             }
 
-            // Footer Watermark
-            ctx.textAlign = 'right';
-            ctx.font = 'bold 18px Inter';
+            // Footer
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 20px Inter';
             ctx.globalAlpha = 0.3;
-            ctx.fillText('SAMKID WATCH REPAIR - OFFICIAL SERVICE RECORD', canvas.width - 60, canvas.height - 40);
+            ctx.fillText('SAMKID WATCH REPAIR - OFFICIAL SERVICE RECORD', canvas.width/2, canvas.height - 40);
             ctx.globalAlpha = 1.0;
         }
 
         downloadBtn.addEventListener('click', () => {
-            if (!uploadedImage) return alert('Pilih foto dulu!');
+            if (!uploadedImage) {
+                alert('Ambil foto terlebih dahulu!');
+                return;
+            }
+            // Menggunakan teknik download yang stabil di browser mobile
+            const dataUrl = canvas.toDataURL('image/png', 1.0);
             const link = document.createElement('a');
-            link.download = `SamkidRepair-${mainTextInput.value.slice(0,15)}.png`;
-            link.href = canvas.toDataURL('image/png', 1.0);
+            link.download = `SamkidRepair-${Date.now()}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         });
 
         init();
