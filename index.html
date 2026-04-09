@@ -104,6 +104,11 @@
         }
         input:checked + .slider { background-color: #3b82f6; }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        .tab-btn.active {
+            background-color: black;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -111,45 +116,44 @@
         
         <header class="p-6 text-center">
             <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">SAMKID WATCH REPAIR</h1>
-            <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mt-1">Poster Generator v1.9</p>
+            <div class="flex justify-center mt-4 bg-gray-200 p-1 rounded-xl gap-1">
+                <button onclick="switchMode('service')" id="btnService" class="tab-btn active flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition">Servis</button>
+                <button onclick="switchMode('education')" id="btnEdu" class="tab-btn flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition">Edukasi/Promo</button>
+            </div>
         </header>
 
         <div class="px-4 mb-6">
             <div class="canvas-container">
                 <canvas id="posterCanvas"></canvas>
             </div>
-            <p class="text-[10px] text-gray-400 text-center mt-2 uppercase font-bold tracking-widest">Ketuk simpan jika sudah sesuai</p>
         </div>
 
         <div class="px-4 space-y-4">
             
-            <!-- Section Media Utama dengan 2 Opsi -->
+            <!-- 1. Media Utama -->
             <div class="controls-card">
                 <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">1. Media Utama</h2>
                 <div class="grid grid-cols-2 gap-3">
-                    <!-- Opsi Kamera -->
                     <button onclick="document.getElementById('cameraInput').click()" class="flex flex-col items-center justify-center p-4 border-2 border-blue-100 bg-blue-50 rounded-xl hover:bg-blue-100 transition active:scale-95">
                         <svg class="w-6 h-6 mb-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span class="text-[10px] font-bold text-blue-700 uppercase">Ambil Foto</span>
                     </button>
-                    <!-- Opsi Galeri -->
                     <button onclick="document.getElementById('galleryInput').click()" class="flex flex-col items-center justify-center p-4 border-2 border-gray-100 bg-gray-50 rounded-xl hover:bg-gray-100 transition active:scale-95">
                         <svg class="w-6 h-6 mb-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <span class="text-[10px] font-bold text-gray-700 uppercase">Buka Galeri</span>
                     </button>
                 </div>
-                <!-- Input hidden dengan atribut capture untuk kamera -->
                 <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden"/>
-                <!-- Input hidden standar untuk galeri -->
                 <input type="file" id="galleryInput" accept="image/*" class="hidden"/>
             </div>
 
-            <div class="controls-card">
+            <!-- 2. Informasi (Mode Servis) -->
+            <div id="panelService" class="controls-card">
                 <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Detail Servis</h2>
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between items-end mb-1">
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Brand / Jam (Bisa Enter)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Brand / Jam</label>
                             <div class="flex items-center gap-2">
                                 <span class="text-[9px] font-bold text-gray-400 uppercase">ABC</span>
                                 <label class="switch">
@@ -162,7 +166,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Detail Pengerjaan</label>
-                        <textarea id="subText" rows="3" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan daftar servis...">Full Movement Overhaul&#10;Gasket Replacement&#10;Water Resistance Test</textarea>
+                        <textarea id="subText" rows="3" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">Full Movement Overhaul&#10;Gasket Replacement&#10;Water Resistance Test</textarea>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Biaya Servis</label>
@@ -171,8 +175,24 @@
                 </div>
             </div>
 
+            <!-- 2. Informasi (Mode Edukasi) -->
+            <div id="panelEdu" class="controls-card hidden">
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Konten Edukasi</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Judul Edukasi</label>
+                        <input type="text" id="eduTitle" value="TAHUKAH ANDA?" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Isi Pesan / Edukasi</label>
+                        <textarea id="eduContent" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">Jam tangan otomatis membutuhkan servis rutin setiap 3-5 tahun sekali untuk menjaga pelumasan mesin tetap optimal.</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Tema -->
             <div class="controls-card">
-                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">3. Pilih Tema Warna (Geser Kanan)</h2>
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">3. Pilih Tema Warna</h2>
                 <div class="theme-scroll" id="themeGrid">
                 </div>
             </div>
@@ -195,46 +215,46 @@
         const uppercaseToggle = document.getElementById('uppercaseToggle');
         const subTextInput = document.getElementById('subText');
         const priceTextInput = document.getElementById('priceText');
+        const eduTitleInput = document.getElementById('eduTitle');
+        const eduContentInput = document.getElementById('eduContent');
         const downloadBtn = document.getElementById('downloadBtn');
         const themeGrid = document.getElementById('themeGrid');
 
         let uploadedImage = null;
         let samkidLogo = new Image();
+        let currentMode = 'service';
         
         samkidLogo.crossOrigin = "anonymous";
         samkidLogo.src = 'https://lh3.googleusercontent.com/d/1q7EOBpRAmOoChIKxcpMrp8unNZ_JpoSk=s800'; 
-        
         samkidLogo.onload = () => { if (uploadedImage) updateCanvas(); };
 
         let bgColor = '#000000';
         let textColor = '#ffffff';
 
         const themes = [
-            { bg: '#000000', text: '#ffffff' }, 
-            { bg: '#ffffff', text: '#000000' }, 
-            { bg: '#facc15', text: '#000000' }, 
-            { bg: '#1e3a8a', text: '#ffffff' }, 
-            { bg: '#111827', text: '#fbbf24' }, 
-            { bg: '#064e3b', text: '#ffffff' }, 
-            { bg: '#431407', text: '#e7d5ac' }, 
-            { bg: '#b91c1c', text: '#ffffff' }, 
-            { bg: '#374151', text: '#f3f4f6' }, 
-            { bg: '#0f172a', text: '#38bdf8' }, 
-            { bg: '#2e1065', text: '#f5d0fe' }, 
-            { bg: '#ea580c', text: '#ffffff' }, 
-            { bg: '#be185d', text: '#ffffff' }, 
-            { bg: '#15803d', text: '#f0fdf4' }, 
-            { bg: '#7c3aed', text: '#ffffff' }, 
-            { bg: '#f472b6', text: '#ffffff' }, 
-            { bg: '#2dd4bf', text: '#134e4a' }, 
-            { bg: '#71717a', text: '#ffffff' }, 
-            { bg: '#78350f', text: '#fef3c7' }, 
-            { bg: '#0c4a6e', text: '#bae6fd' }, 
-            { bg: '#581c87', text: '#f5d0fe' }, 
-            { bg: '#451a03', text: '#fbbf24' }, 
-            { bg: '#1a2e05', text: '#bef264' }, 
-            { bg: '#020617', text: '#94a3b8' }
+            { bg: '#000000', text: '#ffffff' }, { bg: '#ffffff', text: '#000000' }, 
+            { bg: '#facc15', text: '#000000' }, { bg: '#1e3a8a', text: '#ffffff' }, 
+            { bg: '#111827', text: '#fbbf24' }, { bg: '#064e3b', text: '#ffffff' }, 
+            { bg: '#431407', text: '#e7d5ac' }, { bg: '#b91c1c', text: '#ffffff' }, 
+            { bg: '#374151', text: '#f3f4f6' }, { bg: '#0f172a', text: '#38bdf8' }, 
+            { bg: '#2e1065', text: '#f5d0fe' }, { bg: '#ea580c', text: '#ffffff' }, 
+            { bg: '#be185d', text: '#ffffff' }, { bg: '#15803d', text: '#f0fdf4' }
         ];
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(mode === 'service') {
+                document.getElementById('btnService').classList.add('active');
+                document.getElementById('panelService').classList.remove('hidden');
+                document.getElementById('panelEdu').classList.add('hidden');
+            } else {
+                document.getElementById('btnEdu').classList.add('active');
+                document.getElementById('panelService').classList.add('hidden');
+                document.getElementById('panelEdu').classList.remove('hidden');
+            }
+            updateCanvas();
+        }
 
         function init() {
             canvas.width = 1080;
@@ -250,7 +270,6 @@
                 btn.className = `color-dot shrink-0 ${bgColor === theme.bg ? 'active' : ''}`;
                 btn.style.backgroundColor = theme.bg;
                 if(theme.bg === '#ffffff') btn.style.borderColor = '#ddd';
-                
                 btn.onclick = () => {
                     bgColor = theme.bg;
                     textColor = theme.text;
@@ -284,11 +303,27 @@
 
         cameraInput.addEventListener('change', handleImage);
         galleryInput.addEventListener('change', handleImage);
-
-        [mainTextInput, uppercaseToggle, subTextInput, priceTextInput].forEach(el => {
+        [mainTextInput, uppercaseToggle, subTextInput, priceTextInput, eduTitleInput, eduContentInput].forEach(el => {
             el.addEventListener('input', updateCanvas);
-            if(el.type === 'checkbox') el.addEventListener('change', updateCanvas);
         });
+
+        function wrapText(text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = ctx.measureText(testLine);
+                let testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, y);
+                    line = words[n] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, y);
+        }
 
         function updateCanvas() {
             if (!uploadedImage) return;
@@ -296,7 +331,7 @@
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const photoAreaH = canvas.height * 0.72;
+            const photoAreaH = currentMode === 'service' ? canvas.height * 0.72 : canvas.height;
             const imgAspect = uploadedImage.width / uploadedImage.height;
             const targetAspect = canvas.width / photoAreaH;
             
@@ -315,86 +350,98 @@
             ctx.clip();
             ctx.drawImage(uploadedImage, ox, oy, rw, rh);
 
-            if (priceTextInput.value) {
-                const pText = priceTextInput.value;
-                ctx.font = 'bold 44px Inter';
-                ctx.textAlign = 'center';
-                const pWidth = ctx.measureText(pText).width;
-                const boxW = pWidth + 60;
-                const boxH = 90;
-                const boxX = 60; 
-                const boxY = photoAreaH - 120; 
-
-                ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 10;
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(boxX, boxY, boxW, boxH);
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(pText, boxX + boxW/2, boxY + 60);
-                ctx.shadowBlur = 0;
+            // Overlay untuk Edukasi agar teks terbaca
+            if(currentMode === 'education') {
+                const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+                grad.addColorStop(1, bgColor); // Menggunakan warna tema sebagai overlay bawah
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 1.0;
             }
 
+            // Draw Logo (Top Right)
             if (samkidLogo.complete) {
                 const logoH = 180;
-                const lAspect = samkidLogo.width / samkidLogo.height;
-                const logoW = logoH * lAspect;
-                const margin = 50;
+                const logoW = logoH * (samkidLogo.width / samkidLogo.height);
                 ctx.shadowColor = "rgba(0,0,0,0.5)";
                 ctx.shadowBlur = 15;
-                ctx.drawImage(samkidLogo, canvas.width - logoW - margin, margin, logoW, logoH);
+                ctx.drawImage(samkidLogo, canvas.width - logoW - 50, 50, logoW, logoH);
                 ctx.shadowBlur = 0;
             }
-            ctx.restore();
 
-            const labelY = photoAreaH;
-            const labelH = canvas.height - photoAreaH;
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, labelY, canvas.width, labelH);
+            if(currentMode === 'service') {
+                // Harga Mode Servis
+                if (priceTextInput.value) {
+                    ctx.font = 'bold 44px Inter';
+                    ctx.textAlign = 'center';
+                    const pWidth = ctx.measureText(priceTextInput.value).width;
+                    ctx.shadowColor = "rgba(0,0,0,0.5)";
+                    ctx.shadowBlur = 10;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(60, photoAreaH - 120, pWidth + 60, 90);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(priceTextInput.value, 60 + (pWidth + 60)/2, photoAreaH - 120 + 60);
+                    ctx.shadowBlur = 0;
+                }
+                ctx.restore();
 
-            ctx.textAlign = 'left';
-            ctx.fillStyle = textColor;
-            ctx.font = '900 72px Inter';
-            
-            let mainTitle = mainTextInput.value;
-            if (uppercaseToggle.checked) mainTitle = mainTitle.toUpperCase();
-            
-            const titleLines = mainTitle.split('\n');
-            const startY = labelY + 90;
-            const lineHeight = 80;
-            
-            titleLines.forEach((line, i) => {
-                if (i < 2) ctx.fillText(line, 60, startY + (i * lineHeight));
-            });
+                // Label Area Servis
+                const labelY = photoAreaH;
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, labelY, canvas.width, canvas.height - labelY);
 
-            const descOffset = titleLines.length > 1 ? 190 : 120;
-            ctx.font = '500 32px Inter';
-            ctx.globalAlpha = 0.85;
-            const descLines = subTextInput.value.split('\n');
-            descLines.forEach((line, index) => {
-                if(index < 3) ctx.fillText(line, 60, labelY + descOffset + 50 + (index * 45));
-            });
-            ctx.globalAlpha = 1.0;
+                ctx.textAlign = 'left';
+                ctx.fillStyle = textColor;
+                ctx.font = '900 72px Inter';
+                let title = uppercaseToggle.checked ? mainTextInput.value.toUpperCase() : mainTextInput.value;
+                title.split('\n').forEach((line, i) => { if(i < 2) ctx.fillText(line, 60, labelY + 90 + (i*80)); });
 
+                ctx.font = '500 32px Inter';
+                ctx.globalAlpha = 0.85;
+                const off = title.split('\n').length > 1 ? 190 : 120;
+                subTextInput.value.split('\n').forEach((line, i) => { if(i < 3) ctx.fillText(line, 60, labelY + off + 50 + (i*45)); });
+                ctx.globalAlpha = 1.0;
+            } else {
+                // Mode Edukasi
+                ctx.restore();
+                ctx.textAlign = 'center';
+                ctx.fillStyle = textColor;
+                
+                // Judul Edukasi
+                ctx.font = '900 80px Inter';
+                ctx.fillText(eduTitleInput.value.toUpperCase(), canvas.width/2, canvas.height * 0.55);
+                
+                // Garis Pemisah
+                ctx.lineWidth = 8;
+                ctx.strokeStyle = textColor;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width/2 - 100, canvas.height * 0.6);
+                ctx.lineTo(canvas.width/2 + 100, canvas.height * 0.6);
+                ctx.stroke();
+
+                // Isi Edukasi
+                ctx.font = '500 42px Inter';
+                wrapText(eduContentInput.value, canvas.width/2, canvas.height * 0.7, 900, 55);
+            }
+
+            // Footer (Both Modes)
             ctx.textAlign = 'center';
-            ctx.font = 'bold 20px Inter';
-            ctx.globalAlpha = 0.3;
+            ctx.font = 'bold 22px Inter';
+            ctx.globalAlpha = currentMode === 'service' ? 0.3 : 0.6;
+            ctx.fillStyle = textColor;
             ctx.fillText('SAMKIDID WATCH REPAIR - BANDAR LAMPUNG', canvas.width/2, canvas.height - 40);
             ctx.globalAlpha = 1.0;
         }
 
         downloadBtn.addEventListener('click', () => {
-            if (!uploadedImage) {
-                alert('Pilih foto terlebih dahulu!');
-                return;
-            }
-            const dataUrl = canvas.toDataURL('image/png', 1.0);
+            if (!uploadedImage) return alert('Pilih foto dahulu!');
             const link = document.createElement('a');
-            link.download = `SamkidRepair-${Date.now()}.png`;
-            link.href = dataUrl;
-            document.body.appendChild(link);
+            link.download = `Samkid-${currentMode}-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
-            document.body.removeChild(link);
         });
 
         init();
