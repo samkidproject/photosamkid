@@ -180,8 +180,17 @@
                 <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Konten Edukasi</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Judul Edukasi</label>
-                        <input type="text" id="eduTitle" value="TAHUKAH ANDA?" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase ml-1">Judul Edukasi</label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold text-gray-400 uppercase">ABC</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="eduUppercaseToggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <textarea id="eduTitle" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">TAHUKAH&#10;ANDA?</textarea>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Isi Pesan / Edukasi</label>
@@ -216,6 +225,7 @@
         const subTextInput = document.getElementById('subText');
         const priceTextInput = document.getElementById('priceText');
         const eduTitleInput = document.getElementById('eduTitle');
+        const eduUppercaseToggle = document.getElementById('eduUppercaseToggle');
         const eduContentInput = document.getElementById('eduContent');
         const downloadBtn = document.getElementById('downloadBtn');
         const themeGrid = document.getElementById('themeGrid');
@@ -303,7 +313,7 @@
 
         cameraInput.addEventListener('change', handleImage);
         galleryInput.addEventListener('change', handleImage);
-        [mainTextInput, uppercaseToggle, subTextInput, priceTextInput, eduTitleInput, eduContentInput].forEach(el => {
+        [mainTextInput, uppercaseToggle, subTextInput, priceTextInput, eduTitleInput, eduUppercaseToggle, eduContentInput].forEach(el => {
             el.addEventListener('input', updateCanvas);
         });
 
@@ -350,12 +360,12 @@
             ctx.clip();
             ctx.drawImage(uploadedImage, ox, oy, rw, rh);
 
-            // Overlay untuk Edukasi agar teks terbaca
+            // Overlay untuk Edukasi agar teks terbaca - Dibuat lebih ke tengah gradasinya
             if(currentMode === 'education') {
                 const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                grad.addColorStop(0.3, 'rgba(0,0,0,0)');
-                grad.addColorStop(1, bgColor); // Menggunakan warna tema sebagai overlay bawah
-                ctx.globalAlpha = 0.8;
+                grad.addColorStop(0.4, 'rgba(0,0,0,0)'); // Gradasi mulai lebih awal ke tengah
+                grad.addColorStop(1, bgColor); 
+                ctx.globalAlpha = 0.85;
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.globalAlpha = 1.0;
@@ -410,21 +420,29 @@
                 ctx.textAlign = 'center';
                 ctx.fillStyle = textColor;
                 
-                // Judul Edukasi
-                ctx.font = '900 80px Inter';
-                ctx.fillText(eduTitleInput.value.toUpperCase(), canvas.width/2, canvas.height * 0.55);
+                // Judul Edukasi (Multiline)
+                ctx.font = '900 85px Inter';
+                let eduTitle = eduUppercaseToggle.checked ? eduTitleInput.value.toUpperCase() : eduTitleInput.value;
+                const eduTitleLines = eduTitle.split('\n');
+                const titleLineHeight = 90;
+                const baseTitleY = canvas.height * 0.52;
                 
-                // Garis Pemisah
+                eduTitleLines.forEach((line, i) => {
+                    ctx.fillText(line, canvas.width/2, baseTitleY + (i * titleLineHeight));
+                });
+                
+                // Garis Pemisah (Disesuaikan posisinya dengan jumlah baris judul)
+                const lineY = baseTitleY + (eduTitleLines.length * titleLineHeight) - 40;
                 ctx.lineWidth = 8;
                 ctx.strokeStyle = textColor;
                 ctx.beginPath();
-                ctx.moveTo(canvas.width/2 - 100, canvas.height * 0.6);
-                ctx.lineTo(canvas.width/2 + 100, canvas.height * 0.6);
+                ctx.moveTo(canvas.width/2 - 120, lineY);
+                ctx.lineTo(canvas.width/2 + 120, lineY);
                 ctx.stroke();
 
                 // Isi Edukasi
                 ctx.font = '500 42px Inter';
-                wrapText(eduContentInput.value, canvas.width/2, canvas.height * 0.7, 900, 55);
+                wrapText(eduContentInput.value, canvas.width/2, lineY + 90, 900, 55);
             }
 
             // Footer (Both Modes)
