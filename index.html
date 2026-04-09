@@ -16,7 +16,7 @@
 
         .canvas-container {
             width: 100%;
-            max-width: 500px; /* Batas lebar pratinjau di layar besar */
+            max-width: 500px; 
             margin: 0 auto;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -38,7 +38,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Optimalisasi touch target untuk HP */
         .color-dot {
             width: 2.75rem;
             height: 2.75rem;
@@ -59,32 +58,63 @@
             box-shadow: 0 0 0 2px white, 0 0 0 4px #3b82f6;
         }
 
-        /* Scrollbar halus untuk tema warna */
         .theme-scroll {
             display: flex;
             overflow-x: auto;
             gap: 0.75rem;
             padding: 0.5rem 0.25rem;
-            scrollbar-width: none;
+            scrollbar-width: auto; /* Memunculkan scrollbar agar user tahu bisa di-geser */
         }
+        
         .theme-scroll::-webkit-scrollbar {
-            display: none;
+            height: 4px;
+        }
+        .theme-scroll::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 10px;
         }
 
         input, textarea, button {
-            font-size: 16px !important; /* Mencegah auto-zoom di iOS/Android */
+            font-size: 16px !important; 
         }
+
+        /* Custom Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #3b82f6; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-    <div class="max-w-md mx-auto pb-24"> <!-- Container khusus ukuran HP -->
+    <div class="max-w-md mx-auto pb-24">
         
         <header class="p-6 text-center">
             <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">SAMKID WATCH REPAIR</h1>
-            <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mt-1">Mobile Poster Generator v4.2</p>
+            <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mt-1">Poster Generator v1.8</p>
         </header>
 
-        <!-- Preview Section - Selalu di atas pada Mobile -->
         <div class="px-4 mb-6">
             <div class="canvas-container">
                 <canvas id="posterCanvas"></canvas>
@@ -92,26 +122,32 @@
             <p class="text-[10px] text-gray-400 text-center mt-2 uppercase font-bold tracking-widest">Ketuk simpan jika sudah sesuai</p>
         </div>
 
-        <!-- Controls Section -->
         <div class="px-4 space-y-4">
             
-            <!-- 1. Media -->
             <div class="controls-card">
                 <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">1. Media Utama</h2>
                 <button onclick="document.getElementById('imageInput').click()" class="w-full flex items-center justify-center p-4 border-2 border-blue-100 bg-blue-50 rounded-xl hover:bg-blue-100 transition active:scale-95">
                     <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span class="text-sm font-bold text-blue-700">AMBIL FOTO / GALERI</span>
+                    <span class="text-sm font-bold text-blue-700 uppercase">Ambil Foto / Buka Galeri</span>
                 </button>
                 <input type="file" id="imageInput" accept="image/*" class="hidden"/>
             </div>
 
-            <!-- 2. Informasi -->
             <div class="controls-card">
                 <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Detail Servis</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Nama Brand / Jam</label>
-                        <input type="text" id="mainText" value="ROLEX SUBMARINER" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase ml-1">Nama Brand / Jam (Bisa Enter)</label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold text-gray-400 uppercase">ABC</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="uppercaseToggle" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <textarea id="mainText" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">ROLEX&#10;SUBMARINER</textarea>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1">Detail Pengerjaan</label>
@@ -124,18 +160,15 @@
                 </div>
             </div>
 
-            <!-- 3. Tema -->
             <div class="controls-card">
-                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">3. Pilih Tema Warna</h2>
+                <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">3. Pilih Tema Warna (Geser Kanan)</h2>
                 <div class="theme-scroll" id="themeGrid">
-                    <!-- Tema diisi oleh JS -->
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- Floating Action Button (FAB) untuk Simpan di Mobile -->
     <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex gap-3 z-50">
         <button id="downloadBtn" class="flex-1 bg-black text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-transform uppercase tracking-widest text-sm">
             SIMPAN POSTER
@@ -147,6 +180,7 @@
         const ctx = canvas.getContext('2d');
         const imageInput = document.getElementById('imageInput');
         const mainTextInput = document.getElementById('mainText');
+        const uppercaseToggle = document.getElementById('uppercaseToggle');
         const subTextInput = document.getElementById('subText');
         const priceTextInput = document.getElementById('priceText');
         const downloadBtn = document.getElementById('downloadBtn');
@@ -155,26 +189,40 @@
         let uploadedImage = null;
         let samkidLogo = new Image();
         
-        // Memastikan logo terambil dengan benar
         samkidLogo.crossOrigin = "anonymous";
-        samkidLogo.src = 'https://lh3.googleusercontent.com/d/1lczDvL3fub886F5a4tmo6aHBEhMX5Vkr=s800'; 
+        samkidLogo.src = 'https://lh3.googleusercontent.com/d/1q7EOBpRAmOoChIKxcpMrp8unNZ_JpoSk=s800'; 
         
         samkidLogo.onload = () => { if (uploadedImage) updateCanvas(); };
 
         let bgColor = '#000000';
         let textColor = '#ffffff';
 
+        // Daftar tema yang diperbanyak secara signifikan
         const themes = [
-            { bg: '#000000', text: '#ffffff' },
-            { bg: '#ffffff', text: '#000000' },
-            { bg: '#1e3a8a', text: '#ffffff' },
-            { bg: '#111827', text: '#fbbf24' },
-            { bg: '#064e3b', text: '#ffffff' },
-            { bg: '#431407', text: '#e7d5ac' },
-            { bg: '#b91c1c', text: '#ffffff' },
-            { bg: '#374151', text: '#f3f4f6' },
-            { bg: '#0f172a', text: '#38bdf8' },
-            { bg: '#2e1065', text: '#f5d0fe' }
+            { bg: '#000000', text: '#ffffff' }, // Black
+            { bg: '#ffffff', text: '#000000' }, // White
+            { bg: '#facc15', text: '#000000' }, // Yellow
+            { bg: '#1e3a8a', text: '#ffffff' }, // Blue
+            { bg: '#111827', text: '#fbbf24' }, // Midnight Gold
+            { bg: '#064e3b', text: '#ffffff' }, // Forest
+            { bg: '#431407', text: '#e7d5ac' }, // Leather
+            { bg: '#b91c1c', text: '#ffffff' }, // Red
+            { bg: '#374151', text: '#f3f4f6' }, // Grey
+            { bg: '#0f172a', text: '#38bdf8' }, // Dark Sky
+            { bg: '#2e1065', text: '#f5d0fe' }, // Purple
+            { bg: '#ea580c', text: '#ffffff' }, // Orange
+            { bg: '#be185d', text: '#ffffff' }, // Rose
+            { bg: '#15803d', text: '#f0fdf4' }, // Grass
+            { bg: '#7c3aed', text: '#ffffff' }, // Violet
+            { bg: '#f472b6', text: '#ffffff' }, // Pink
+            { bg: '#2dd4bf', text: '#134e4a' }, // Mint
+            { bg: '#71717a', text: '#ffffff' }, // Zinc
+            { bg: '#78350f', text: '#fef3c7' }, // Amber Dark
+            { bg: '#0c4a6e', text: '#bae6fd' }, // Cyan Dark
+            { bg: '#581c87', text: '#f5d0fe' }, // Indigo Dark
+            { bg: '#451a03', text: '#fbbf24' }, // Wood
+            { bg: '#1a2e05', text: '#bef264' }, // Lime Dark
+            { bg: '#020617', text: '#94a3b8' }  // Obsidian
         ];
 
         function init() {
@@ -223,16 +271,17 @@
             reader.readAsDataURL(file);
         });
 
-        [mainTextInput, subTextInput, priceTextInput].forEach(el => el.addEventListener('input', updateCanvas));
+        [mainTextInput, uppercaseToggle, subTextInput, priceTextInput].forEach(el => {
+            el.addEventListener('input', updateCanvas);
+            if(el.type === 'checkbox') el.addEventListener('change', updateCanvas);
+        });
 
         function updateCanvas() {
             if (!uploadedImage) return;
 
-            // Dasar Kanvas
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Photo Area (72% Tinggi)
             const photoAreaH = canvas.height * 0.72;
             const imgAspect = uploadedImage.width / uploadedImage.height;
             const targetAspect = canvas.width / photoAreaH;
@@ -252,7 +301,31 @@
             ctx.clip();
             ctx.drawImage(uploadedImage, ox, oy, rw, rh);
 
-            // 2. Logo (Watermark Besar di Pojok Kanan Atas)
+            // 1. Harga dengan Bingkai (Stroke) di area foto
+            if (priceTextInput.value) {
+                const pText = priceTextInput.value;
+                ctx.font = 'bold 44px Inter';
+                ctx.textAlign = 'center';
+                
+                const pWidth = ctx.measureText(pText).width;
+                const boxW = pWidth + 60;
+                const boxH = 90;
+                const boxX = 60; 
+                const boxY = photoAreaH - 120; 
+
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 10;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(pText, boxX + boxW/2, boxY + 60);
+                
+                ctx.shadowBlur = 0;
+            }
+
+            // 2. Logo (Pojok Kanan Atas)
             if (samkidLogo.complete) {
                 const logoH = 180;
                 const lAspect = samkidLogo.width / samkidLogo.height;
@@ -266,53 +339,47 @@
             }
             ctx.restore();
 
-            // 3. Label Area (Bawah)
+            // 3. Label Area (Kotak Tema Warna Bawah)
             const labelY = photoAreaH;
             const labelH = canvas.height - photoAreaH;
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, labelY, canvas.width, labelH);
 
-            // 4. Nama Jam (Header)
+            // 4. Nama Jam (Dukung Multiline & Uppercase Toggle)
             ctx.textAlign = 'left';
             ctx.fillStyle = textColor;
             ctx.font = '900 72px Inter';
-            ctx.fillText(mainTextInput.value.toUpperCase(), 60, labelY + 100);
+            
+            let mainTitle = mainTextInput.value;
+            if (uppercaseToggle.checked) mainTitle = mainTitle.toUpperCase();
+            
+            const titleLines = mainTitle.split('\n');
+            const startY = labelY + 90;
+            const lineHeight = 80;
+            
+            titleLines.forEach((line, i) => {
+                if (i < 2) { 
+                    ctx.fillText(line, 60, startY + (i * lineHeight));
+                }
+            });
 
-            // 5. Deskripsi Pengerjaan
+            // 5. Deskripsi Pengerjaan (Menyesuaikan posisi berdasarkan jumlah baris judul)
+            const descOffset = titleLines.length > 1 ? 190 : 120;
             ctx.font = '500 32px Inter';
             ctx.globalAlpha = 0.85;
-            const lines = subTextInput.value.split('\n');
-            lines.forEach((line, index) => {
-                if(index < 5) {
-                    ctx.fillText(line, 60, labelY + 165 + (index * 45));
+            const descLines = subTextInput.value.split('\n');
+            descLines.forEach((line, index) => {
+                if(index < 3) { 
+                    ctx.fillText(line, 60, labelY + descOffset + 50 + (index * 45));
                 }
             });
             ctx.globalAlpha = 1.0;
-
-            // 6. Elemen Harga Elegan (Kanan)
-            if (priceTextInput.value) {
-                const pText = priceTextInput.value;
-                ctx.font = 'bold 42px Inter';
-                const pWidth = ctx.measureText(pText).width;
-                
-                const boxW = pWidth + 80;
-                const boxH = 100;
-                const boxX = canvas.width - boxW - 60;
-                const boxY = labelY + 70;
-
-                ctx.strokeStyle = textColor;
-                ctx.lineWidth = 4;
-                ctx.strokeRect(boxX, boxY, boxW, boxH);
-                
-                ctx.textAlign = 'center';
-                ctx.fillText(pText, boxX + boxW/2, boxY + 65);
-            }
 
             // Footer
             ctx.textAlign = 'center';
             ctx.font = 'bold 20px Inter';
             ctx.globalAlpha = 0.3;
-            ctx.fillText('SAMKID WATCH REPAIR - OFFICIAL SERVICE RECORD', canvas.width/2, canvas.height - 40);
+            ctx.fillText('SAMKIDID WATCH REPAIR - BANDAR LAMPUNG', canvas.width/2, canvas.height - 40);
             ctx.globalAlpha = 1.0;
         }
 
@@ -321,7 +388,6 @@
                 alert('Ambil foto terlebih dahulu!');
                 return;
             }
-            // Menggunakan teknik download yang stabil di browser mobile
             const dataUrl = canvas.toDataURL('image/png', 1.0);
             const link = document.createElement('a');
             link.download = `SamkidRepair-${Date.now()}.png`;
